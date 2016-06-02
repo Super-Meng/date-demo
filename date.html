@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>日历</title>
+	<meta http-equiv="X-UA-Compatible" content="chrome=1,IE=Edge"/>
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/common.min.js"></script>
+	<style type="text/css">
+		*{
+			box-sizing:border-box;
+		}
+		.fl{
+			float: left;
+		}
+		.fr{
+			float: right;
+		}
+		.clear{
+			clear: both;
+		}
+		a{
+			color: #4c4c4c;
+			text-decoration: none;
+		}
+		body{
+			background: #ECF0F1;
+		}
+		.date_box{
+			margin: 120px auto;
+			position: relative;
+			width: 764px;
+			background: #FFF;
+			text-align: center;
+			border: solid 1px #ddd;
+			font-family: Microsoft YaHei;
+		}
+		.calendar{
+			position: relative;
+			width: 520px;
+			padding: 0 16px;
+		}
+		.calendar .date{
+			height: 50px;
+			line-height: 50px;
+			font-size: 16px;
+			color: #666;
+			border-bottom: solid 1px #D1D7D8;
+		}
+		.calendar .date .left, .calendar .date .right{
+			position: absolute;
+			top: 5px;
+			left: 10px;
+			width: 30px;
+			height: 40px;
+			background: url(image/icon_date_page.png) no-repeat;
+			background-position: 0 0;
+		}
+		.calendar .date .right{
+		 	left: auto;
+		 	right: 10px;
+			background-position: -30px 0;
+		 }
+		.calendar .date .left:hover{
+			background-position: 0 -40px;
+		}
+		.calendar .date .right:hover{
+			background-position: -30px -40px;
+		}
+		.calendar .week{
+			position: relative;
+		}
+		.calendar .week span{
+			display: block;
+			float: left;
+			width: 14.285%;
+			height: 60px;
+			line-height: 60px;
+			color: #666;
+		}
+		.calendar .day{
+			position: relative;
+			border-bottom: solid 1px #D1D7D8;
+		}
+		.calendar .day span{
+			display: block;
+			float: left;
+			border-top: solid 1px #D1D7D8;
+			border-left: solid 1px #D1D7D8;
+			width: 14.285%;
+			height: 40px;
+			line-height: 40px;
+			color: #898A8A;
+			background: #F7F6F5;
+		}
+		.calendar .day span:nth-child(7n){
+			border-right: solid 1px #D1D7D8;
+		}
+		.calendar .day .bg{
+			background: #FFF;
+		}
+		.calendar .day span a{
+			display: block;
+			transition: all 300ms ease;
+		}
+		.calendar .day .today a{
+			font-weight: bold;
+			color: #ff7a21;
+			background: #FFF7EE;
+		}
+		.a_click_style a{
+			color: #FF9C58;
+			font-weight: bold;
+			background: #FDE9D2;
+		}
+
+		.detail{
+			position: relative;
+			width: 242px;
+			height: 360px;
+			background: #F3F3F3;
+		}
+		.detail .show_today{
+			position: relative;
+			margin: 40px auto 30px;
+			background: #FFF;
+			border-radius: 4px;
+			width: 110px;
+			height: 140px;
+			border-bottom: solid 2px #DEDCDC;
+			border-right: solid 1px #F3F2F2;
+			border-left: solid 1px #F3F2F2;
+			padding-top: 10px;
+		}
+		.detail .today_box{
+			position: relative;
+			margin: auto;
+			border-radius: 4px;
+			width: 88px;
+			height: 90px;
+			background: #158E81;
+		}
+		.detail .show_today .this_day{
+			position: relative;
+			display: block;
+			text-align: center;
+			line-height: 88px;
+			font-size: 60px;
+			color: #FFF;
+			background: #0CB5A2;
+			overflow: hidden;
+			border-radius: 4px;
+		}
+		.detail .show_today .day_up, .detail .show_today .day_down, .detail .show_today .day_copy{
+			position: absolute;
+			margin: auto;
+			top: 0;
+			left: 0;
+			right: 0;
+			height: 88px;
+			background: #0CB5A2;
+			transform:rotateX(0deg);
+			z-index: 2;
+		}
+		.detail .show_today .day_up{
+		    border-top: solid 1px #18CAB7;
+		}
+		.detail .show_today .day_down,.detail .show_today .day_copy{
+			top: 44px;
+			line-height: 0;
+			height: 44px;
+			z-index: 3;
+			border-bottom: solid 1px #158E81;
+		}
+		.detail .show_today .day_copy{
+			z-index: 2;
+		}
+		.detail .show_today .line{
+			position: absolute;
+			width: 100%;
+			height: 1px;
+			margin: auto;
+			top: 0;
+			bottom: 0;
+			left: 0;
+			right: 0;
+			background: #158E81;
+			z-index: 9;
+		}
+		.detail .show_today .line_1{
+			top: 1px;
+			background: #18CAB7;
+		}
+		.detail .show_today .line_2{
+			bottom: 1px;
+		}
+		.detail .show_today .left, .detail .show_today .right{
+			position: absolute;
+			margin: auto;
+			top: 0;
+			bottom: 0;
+			left: -4px;
+			width: 4px;
+			height: 10px;
+			background: #666;
+			border-radius: 2px 0 0 2px;
+		}
+		.detail .show_today .left{
+			left: auto;
+			right: -4px;
+			border-radius: 0 2px 2px 0;
+		}
+		.detail .this_week{
+			display: block;
+			height: 40px;
+			line-height: 40px;
+			text-align: center;
+			font-size: 16px;
+			color: #999;
+		}
+		
+		.detail .show_interest{
+			position: relative;
+			padding-top: 15px;
+		}
+		.detail .show_interest .interest{
+			display: block;
+			font-size: 36px;
+			color: #ff7a21;
+		}
+		.detail .show_interest .text{
+			display: block;
+			color: #999;
+			font-size: 12px;
+		}
+
+		.detail .detail_footer{
+			display: none;
+			position: absolute;
+			bottom: 0;
+			left: 0;
+			width: 100%;
+			text-align: center;
+		}
+		.detail .detail_footer a{
+			position: relative;
+			display: inline-block;
+			color: #666;
+			padding-left: 25px;
+			height: 30px;
+			line-height: 30px;
+		}
+		.detail a span{
+			position: absolute;
+			margin: auto;
+			left: 5px;
+			top: 0;
+			bottom: 0;
+			display: block;
+			width: 15px;
+			height: 15px;
+			background: #ff7a21;
+		}
+		.detail .btn_interestday span{
+			background: #FFF;
+			border-radius: 50%;
+			border: solid 1px #ff7a21;
+		}
+	</style>
+</head>
+<body>
+	<div class="date_box">
+		<div class="calendar fl">
+			<div class="date">
+				<span class="y">2016</span> 年
+				<span class="m">2</span> 月
+				<a href="javascript:" class="left"></a>
+				<a href="javascript:" class="right"></a>
+			</div>
+			<div class="week">
+				<span>星期日</span>
+				<span>星期一</span>
+				<span>星期二</span>
+				<span>星期三</span>
+				<span>星期四</span>
+				<span>星期五</span>
+				<span>星期六</span>
+				<div class="clear"></div>
+			</div>
+			<div class="day">
+				<div class="clear"></div>
+			</div>
+		</div>
+		<div class="detail fl">
+			<div class="show_today">
+				<div class="today_box">
+					<span class="this_day day_bg"></span>
+					<span class="this_day day_copy"></span>
+					<span class="this_day day_up"></span>
+					<span class="this_day day_down"></span>
+					<span class="line line_1"></span>
+					<span class="line line_2"></span>
+					<span class="left"></span>
+					<span class="right"></span>
+				</div>
+				<span class="this_week"></span>
+			</div>
+
+			<div class="show_interest">
+				<span class="interest">12.64</span>
+				<span class="text">收取利息 (元)</span>
+			</div>
+			<div class="detail_footer">
+				<a href="javascript:" class="btn_today"><span class="fl"></span>今天</a>
+				<a href="javascript:" class="btn_interestday"><span class="fl"></span>还款日</a>
+			</div>
+		</div>
+		<div class="clear"></div>
+	</div>
+	<script type="text/javascript">
+		$(function(){
+			//默认今天时间
+			var mydate = new Date()
+			var _y = mydate.getFullYear()
+			var _m = mydate.getMonth() + 1
+
+			set_calendar()
+			set_day(_y, _m)
+
+			$('.calendar .date .left').on('click', function(){
+				_m --
+				if(_m < 1){
+					_m = 12
+					_y --
+				}
+				set_day(_y, _m)
+			})
+			$('.calendar .date .right').on('click', function(){
+				_m ++
+				if(_m > 12){
+					_m = 1
+					_y ++
+				}
+				set_day(_y, _m)
+			})
+
+			function set_calendar(){
+				for(i = 0; i < 7*6;i++){
+					$('.calendar .day').prepend('<span></span>')
+				}
+			}
+			function set_day(_y, _m){
+				$('.calendar .date .y').html(_y)
+				$('.calendar .date .m').html(_m)
+				//求出1号星期几
+				var w  = function(_y, m, d){
+					/*
+					**蔡勒公式：
+					**1582年9月3日后
+					**w = y+[y/4]+[c/4]-2c+[26(m+1）/10]+d-1
+					**C是世纪数减一
+					**y是年份后两位
+					**M是月份
+					**d是日数
+					**1月和2月要按上一年的13月和 14月来算,这时C和y均按上一年取值
+					*/
+					m = parseInt(m)
+					d = parseInt(d)
+
+					if(m < 3){
+						m += 12
+						_y--
+					}
+
+					var c = parseInt(_y.toString().substring(0,2))
+					var y = parseInt(_y.toString().substring(2,4))
+					var w = y + Math.floor(y/4) + Math.floor(c/4) - 2*c + Math.floor(13*(m+1)/5) + d - 1
+					
+					return (w%7+7)%7
+				}
+				var mydate = new Date()
+				var _w = w( _y, _m, 1)
+				var day = 1;
+				var days = 0;
+				//闰年计算:四年一闰,百年不闰,四百年再闰
+				if(_m == 2){
+					if(_y%4 == 0 || !_y%100 == 0 || _y%400 == 0){
+						days = 29
+					}else{
+						days = 28
+					}
+				}else if(_m == 1 || _m ==3 || _m ==5 || _m ==7 || _m ==8 || _m ==10 || _m ==12){
+					days = 31
+				}else if(_m == 4 || _m == 6 || _m == 9 || _m == 11){
+					days = 30
+				}
+				//添加日期	
+				for(var i = 0;i <7*6; i++){
+					if(i >= _w && i < _w + days){
+						$('.calendar .day span').eq(i).addClass('bg').html('<a href="javascript:" data-y="'+_y+'" data-m="'+_m+'" data-d="'+day+'">'+ day +'</a>')
+						day ++
+					}else{
+						$('.calendar .day span').eq(i).removeClass('bg').html('')
+					}
+				}
+				//绑定日期事件
+				$('.calendar .day span a').on('click', function(){
+					var a_y = $(this).attr('data-y')
+					var a_m = $(this).attr('data-m')
+					var a_d = $(this).attr('data-d')
+					var a_w = w(a_y, a_m, a_d)
+
+					$('.calendar .day span a').not(this).parent().removeClass('a_click_style')
+					$(this).parent().addClass('a_click_style')
+
+					date_animation(a_d, a_w)
+				})
+				//标注今天
+				var this_y = mydate.getFullYear()
+				var this_m = mydate.getMonth() + 1
+				var this_d = mydate.getDate()
+
+				if(this_y == _y && this_m == _m){
+					$('.calendar .day span').eq(_w + this_d -1).addClass('today a_click_style')
+					date_animation(this_d, _w)
+				}else{
+					if($('.today').length != 0){
+						$('.today').removeClass('today')
+					}
+				}
+				if($('.a_click_style').length != 0){
+					$('.a_click_style').removeClass('a_click_style')
+				}
+				function this_week(w){
+					switch(w){
+						case 0:
+							 return '星期日'
+						break
+						case 1:
+							 return '星期一'
+						break
+						case 2:
+							 return '星期二'
+						break
+						case 3:
+							 return '星期三'
+						break
+						case 4:
+							 return '星期四'
+						break
+						case 5:
+							 return '星期五'
+						break
+						case 6:
+							 return '星期六'
+						break
+					}
+				}
+				function date_animation(date, week){
+					var rotate_data = 0
+					var day_up = $('.detail .show_today .day_up')
+					var day_down = $('.detail .show_today .day_down')
+					var day_copy = $('.detail .show_today .day_copy')
+					var day_bg = $('.detail .show_today .day_bg')
+					var day_week = $('.detail .this_week')
+
+					day_bg.html(date)
+					day_week.html(this_week(week))
+					var date_rotate_up = setInterval(function(){
+						day_up.css({
+							'transform': 'rotateX('+ -10*rotate_data + 'deg)'
+						})
+						if(rotate_data >= 9){
+							clearInterval(date_rotate_up)
+							day_up.css({
+								'transform': 'rotateX(0deg)',
+								'z-index': 4,
+								'height':'44px'
+							})
+							day_down.css({
+								'transform': 'rotateX(-90deg)',
+								'z-index': 3,
+								'height': '88px',
+								'line-height': '88px',
+								'top': 0
+							})
+							day_up.html(date)
+							day_down.html(date)
+							//down
+							var date_rotate_down = setInterval(function(){
+								day_down.css({
+									'transform': 'rotateX('+ -10*rotate_data + 'deg)'
+								})
+								if(rotate_data <= 0){
+									clearInterval(date_rotate_down)
+									day_up.removeAttr('style')
+									day_down.removeAttr('style')
+									day_copy.html(date)
+								}
+								rotate_data --
+							}, 1000/60)
+							//end
+						}
+						rotate_data ++
+					}, 1000/60)
+				}
+			}
+		})
+	</script>
+</body>
+</html>
